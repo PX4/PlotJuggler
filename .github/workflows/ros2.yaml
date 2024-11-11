@@ -1,7 +1,6 @@
 name: ros2
 
-# on: [push, pull_request]
-on : [pull_request]
+on: [push, pull_request]
 
 jobs:
   industrial_ci:
