@@ -20,16 +20,23 @@ jobs:
         run: |
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           echo "eval $(/opt/homebrew/bin/brew shellenv)" >> $GITHUB_ENV
+          echo "HOMEBREW_PREFIX=/opt/homebrew" >> $GITHUB_ENV
+          echo "HOMEBREW_CELLAR=/opt/homebrew/Cellar" >> $GITHUB_ENV
+          echo "HOMEBREW_REPOSITORY=/opt/homebrew" >> $GITHUB_ENV
         shell: bash
+
+      - name: Update PATH
+        run: echo "PATH=$PATH:/opt/homebrew/bin:/opt/homebrew/sbin" >> $GITHUB_ENV
 
       - name: Install dependencies
         run: |
+          source $GITHUB_ENV
           brew install libzmq mosquitto parquet
         shell: bash
-        
+
       - name: Cache Qt
         id: cache-qt
-        uses: actions/cache@v1  # not v2!
+        uses: actions/cache@v1
         with:
           path: '${{ github.workspace }}/qt_installation/'
           key: ${{ runner.os }}-QtCache
@@ -46,6 +53,6 @@ jobs:
 
       - name: Build Plotjuggler
         shell: pwsh
-        run: >
-          cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler;
+        run: |
+          cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler
           cmake --build build --target install
