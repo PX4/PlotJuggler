@@ -31,7 +31,8 @@ jobs:
       - name: Install dependencies
         run: |
           source $GITHUB_ENV
-          brew install libzmq mosquitto parquet
+          brew update
+          brew install mosquitto zeromq
         shell: bash
 
       - name: Cache Qt
