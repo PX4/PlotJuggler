@@ -16,6 +16,17 @@ jobs:
       - name: Sync repository
         uses: actions/checkout@v2
 
+      - name: Set up Homebrew
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo "eval $(/opt/homebrew/bin/brew shellenv)" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Install dependencies
+        run: |
+          brew install libzmq mosquitto parquet
+        shell: bash
+        
       - name: Cache Qt
         id: cache-qt
         uses: actions/cache@v1  # not v2!
@@ -31,7 +42,7 @@ jobs:
           dir: '${{ github.workspace }}/qt_installation/'
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
           aqtversion: '==3.1.17'
-          py7zrversion: '==0.22.0' 
+          py7zrversion: '==0.22.0'
 
       - name: Build Plotjuggler
         shell: pwsh
