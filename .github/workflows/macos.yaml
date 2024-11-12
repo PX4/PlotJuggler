@@ -5,42 +5,30 @@ on: [push, pull_request]
 jobs:
 
   macos-build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os.os }}
     strategy:
       fail-fast: false
       matrix:
         os:
-          - 'macos-13'  # Intel-based
-          - 'macos-latest'  # Apple Silicon (M1)
-        qt-arch:
-          - 'clang_64'  # Intel
-          - 'arm64'  # Apple Silicon
-        exclude:
-          - os: 'macos-13'
-            qt-arch: 'arm64'  # Skip incompatible combinations
-          - os: 'macos-latest'
-            qt-arch: 'clang_64'  # Skip incompatible combinations
+          - {arch: clang_64, os: macos-13}
+          - {arch: arm64, os: macos-latest}
 
     steps:
       - name: Sync repository
         uses: actions/checkout@v2
 
-      - name: Update PATH
-        run: echo "PATH=$PATH:/opt/homebrew/bin:/opt/homebrew/sbin" >> $GITHUB_ENV
-
       - name: Install dependencies
         run: |
-          source $GITHUB_ENV
           brew update
           brew install mosquitto zeromq
-        shell: bash
+        shell: pwsh
 
       - name: Cache Qt
         id: cache-qt
         uses: actions/cache@v4
         with:
           path: '${{ github.workspace }}/qt_installation/'
-          key: ${{ runner.os }}-QtCache-${{ matrix.qt-arch }}
+          key: ${{ runner.os }}-QtCache-${{ matrix.os.arch }}-5.15.2
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4.1.0
@@ -48,7 +36,7 @@ jobs:
           version: '5.15.2'
           host: 'mac'
           dir: '${{ github.workspace }}/qt_installation/'
-          arch: ${{ matrix.qt-arch }}
+          arch: ${{ matrix.os.arch }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
       - name: Build Plotjuggler
