@@ -26,14 +26,14 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Cache Qt
-        id: cache-qt
+        id: cache_qt  
         uses: actions/cache@v4
         with:
           path: '${{ github.workspace }}/qt_installation/'
           key: ${{ runner.os }}-QtCache-${{ matrix.qt-arch }}
 
       - name: Install Qt if Cache Miss
-        if: steps.cache-qt.outputs.cache-hit != 'true'
+        if: steps.cache_qt.outputs.cache-hit != 'true'
         run: |
           echo "PATH=$PATH:/opt/homebrew/bin:/opt/homebrew/sbin" >> $GITHUB_ENV
           source $GITHUB_ENV
@@ -47,7 +47,7 @@ jobs:
           brew update
           brew install cmake protobuf mosquitto zeromq zstd
         shell: bash
-        
+
       - name: Set Qt Environment Variables
         run: |
           QT_HOME=$(brew --prefix qt@5)
@@ -57,13 +57,6 @@ jobs:
           echo "LDFLAGS=$QT_HOME/lib" >> $GITHUB_ENV
         shell: bash
 
-      - name: Cache Qt
-        id: cache-qt
-        uses: actions/cache@v4
-        with:
-          path: '${{ github.workspace }}/qt_installation/'
-          key: ${{ runner.os }}-QtCache-${{ matrix.qt-arch }}
-
       - name: Install Qt
         uses: jurplel/install-qt-action@v4.1.0
         with:
@@ -71,7 +64,7 @@ jobs:
           host: 'mac'
           dir: '${{ github.workspace }}/qt_installation/'
           arch: ${{ matrix.qt-arch }}
-          cached: ${{ steps.cache-qt.outputs.cache-hit }}
+          cached: ${{ steps.cache_qt.outputs.cache-hit }}
           aqtversion: '==3.1.18'
           py7zrversion: '==0.22.0'
 
