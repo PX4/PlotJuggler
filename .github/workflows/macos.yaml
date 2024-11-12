@@ -25,37 +25,22 @@ jobs:
       - name: Sync repository
         uses: actions/checkout@v2
 
+      - name: Update PATH
+        run: echo "PATH=$PATH:/opt/homebrew/bin:/opt/homebrew/sbin" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: |
+          source $GITHUB_ENV
+          brew update
+          brew install mosquitto zeromq
+        shell: bash
+
       - name: Cache Qt
-        id: cache_qt  
+        id: cache-qt
         uses: actions/cache@v4
         with:
           path: '${{ github.workspace }}/qt_installation/'
           key: ${{ runner.os }}-QtCache-${{ matrix.qt-arch }}
-
-      - name: Install Qt if Cache Miss
-        if: steps.cache_qt.outputs.cache-hit != 'true'
-        run: |
-          echo "PATH=$PATH:/opt/homebrew/bin:/opt/homebrew/sbin" >> $GITHUB_ENV
-          source $GITHUB_ENV
-          brew install qt@5
-          brew link qt@5 --force --overwrite
-        shell: bash
-
-      - name: Install Other Dependencies
-        run: |
-          source $GITHUB_ENV
-          brew update
-          brew install cmake protobuf mosquitto zeromq zstd
-        shell: bash
-
-      - name: Set Qt Environment Variables
-        run: |
-          QT_HOME=$(brew --prefix qt@5)
-          echo "QT_HOME=$QT_HOME" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I $QT_HOME/include" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$QT_HOME/lib/pkgconfig" >> $GITHUB_ENV
-          echo "LDFLAGS=$QT_HOME/lib" >> $GITHUB_ENV
-        shell: bash
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4.1.0
@@ -64,13 +49,10 @@ jobs:
           host: 'mac'
           dir: '${{ github.workspace }}/qt_installation/'
           arch: ${{ matrix.qt-arch }}
-          cached: ${{ steps.cache_qt.outputs.cache-hit }}
-          aqtversion: '==3.1.18'
-          py7zrversion: '==0.22.0'
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
-      - name: Build PlotJuggler
+      - name: Build Plotjuggler
         shell: pwsh
         run: |
-          source $GITHUB_ENV
-          cmake -S src/PlotJuggler -B build/PlotJuggler -DCMAKE_INSTALL_PREFIX=install
-          cmake --build build/PlotJuggler --config RelWithDebInfo --target install
+          cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler
+          cmake --build build --target install
