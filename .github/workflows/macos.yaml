@@ -5,12 +5,21 @@ on: [push, pull_request]
 jobs:
 
   macos-build:
-    runs-on: ${{ matrix.macos-version }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        macos-version:
-          - 'macos-latest'
+        os:
+          - 'macos-13'  # Intel-based
+          - 'macos-latest'  # Apple Silicon (M1)
+        qt-arch:
+          - 'clang_64'  # Intel
+          - 'arm64'  # Apple Silicon
+        exclude:
+          - os: 'macos-13'
+            qt-arch: 'arm64'  # Skip incompatible combinations
+          - os: 'macos-latest'
+            qt-arch: 'clang_64'  # Skip incompatible combinations
 
     steps:
       - name: Sync repository
@@ -28,19 +37,20 @@ jobs:
 
       - name: Cache Qt
         id: cache-qt
-        uses: actions/cache@v4  # updated to v4
+        uses: actions/cache@v4
         with:
           path: '${{ github.workspace }}/qt_installation/'
-          key: ${{ runner.os }}-QtCache
+          key: ${{ runner.os }}-QtCache-${{ matrix.qt-arch }}
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v4.1.0  # updated to v4.1.0
+        uses: jurplel/install-qt-action@v4.1.0
         with:
           version: '5.15.2'
           host: 'mac'
           dir: '${{ github.workspace }}/qt_installation/'
+          arch: ${{ matrix.qt-arch }}
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
-          aqtversion: '==3.1.18'  # updated to 3.1.18
+          aqtversion: '==3.1.18'
           py7zrversion: '==0.22.0'
 
       - name: Build Plotjuggler
