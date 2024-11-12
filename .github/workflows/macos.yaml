@@ -44,3 +44,9 @@ jobs:
         run: |
           cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler
           cmake --build build --target install
+
+      - name: Setup tmate session
+        if: always()
+        run: |
+          brew install tmate
+          tmate -F
