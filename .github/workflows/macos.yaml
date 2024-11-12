@@ -3,7 +3,6 @@ name: macos
 on: [push, pull_request]
 
 jobs:
-
   macos-build:
     runs-on: ${{ matrix.os.os }}
     strategy:
@@ -20,24 +19,8 @@ jobs:
       - name: Install dependencies
         run: |
           brew update
-          brew install mosquitto zeromq
+          brew install mosquitto zeromq qt@5
         shell: pwsh
-
-      - name: Cache Qt
-        id: cache-qt
-        uses: actions/cache@v4
-        with:
-          path: '${{ github.workspace }}/qt_installation/'
-          key: ${{ runner.os }}-QtCache-${{ matrix.os.arch }}-5.15.2
-
-      - name: Install Qt
-        uses: jurplel/install-qt-action@v4.1.0
-        with:
-          version: '5.15.2'
-          host: 'mac'
-          dir: '${{ github.workspace }}/qt_installation/'
-          arch: ${{ matrix.os.arch }}
-          cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
       - name: Build Plotjuggler
         shell: pwsh
@@ -46,7 +29,5 @@ jobs:
           cmake --build build --target install
 
       - name: Setup tmate session
-        if: always()
-        run: |
-          brew install tmate
-          tmate -F
+        if: ${{ failure() }}
+        uses: mxschmitt/action-tmate@v3
