@@ -1,6 +1,12 @@
 name: macos
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - 'main'
+  pull_request:
+    branches:
+    - '*'
 
 jobs:
   macos-build:
@@ -9,24 +15,21 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - {arch: clang_64, os: macos-13}
-          - {arch: arm64, os: macos-latest}
+          - macos-13
+          - macos-latest
 
     steps:
       - name: Sync repository
         uses: actions/checkout@v2
 
-      - name: Clean Homebrew locks and cache
+      - name: Prepare Homebrew and Install Dependencies
         run: |
           rm -rf /usr/local/var/homebrew/locks
           brew cleanup -s
-
-      - name: Install dependencies
-        run: |
           brew update
           brew install mosquitto zeromq qt@5
 
-      - name: Set environment variables
+      - name: Build PlotJuggler
         run: |
           export CMAKE_PREFIX_PATH=$(brew --prefix qt@5):$(brew --prefix zeromq)
           export LDFLAGS="-L/usr/local/opt/zeromq/lib"
@@ -36,9 +39,3 @@ jobs:
 
           cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler
           cmake --build build --target install
-
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
-        with:
-          ssh-public-key: ${{ secrets.TMATE_SSH_KEY }}
