@@ -17,14 +17,20 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install dependencies
+        shell: bash
         run: |
           brew update
           brew install mosquitto zeromq qt@5
-        shell: pwsh
 
-      - name: Build Plotjuggler
-        shell: pwsh
+      - name: Set environment variables
+        shell: bash
         run: |
+          export CMAKE_PREFIX_PATH=$(brew --prefix qt@5):$(brew --prefix zeromq)
+          export LDFLAGS="-L/usr/local/opt/zeromq/lib"
+          export CPPFLAGS="-I/usr/local/opt/zeromq/include"
+          export LIBRARY_PATH=/usr/local/opt/zeromq/lib
+          export CPATH=/usr/local/opt/zeromq/include
+
           cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler
           cmake --build build --target install
 
