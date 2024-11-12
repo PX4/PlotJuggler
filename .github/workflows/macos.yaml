@@ -16,15 +16,6 @@ jobs:
       - name: Sync repository
         uses: actions/checkout@v2
 
-      - name: Set up Homebrew
-        run: |
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-          echo "eval $(/opt/homebrew/bin/brew shellenv)" >> $GITHUB_ENV
-          echo "HOMEBREW_PREFIX=/opt/homebrew" >> $GITHUB_ENV
-          echo "HOMEBREW_CELLAR=/opt/homebrew/Cellar" >> $GITHUB_ENV
-          echo "HOMEBREW_REPOSITORY=/opt/homebrew" >> $GITHUB_ENV
-        shell: bash
-
       - name: Update PATH
         run: echo "PATH=$PATH:/opt/homebrew/bin:/opt/homebrew/sbin" >> $GITHUB_ENV
 
@@ -37,19 +28,19 @@ jobs:
 
       - name: Cache Qt
         id: cache-qt
-        uses: actions/cache@v1
+        uses: actions/cache@v4  # updated to v4
         with:
           path: '${{ github.workspace }}/qt_installation/'
           key: ${{ runner.os }}-QtCache
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2.13.0
+        uses: jurplel/install-qt-action@v4.1.0  # updated to v4.1.0
         with:
           version: '5.15.2'
           host: 'mac'
           dir: '${{ github.workspace }}/qt_installation/'
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
-          aqtversion: '==3.1.17'
+          aqtversion: '==3.1.18'  # updated to 3.1.18
           py7zrversion: '==0.22.0'
 
       - name: Build Plotjuggler
