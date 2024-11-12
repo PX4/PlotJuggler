@@ -25,14 +25,25 @@ jobs:
       - name: Sync repository
         uses: actions/checkout@v2
 
-      - name: Update PATH
-        run: echo "PATH=$PATH:/opt/homebrew/bin:/opt/homebrew/sbin" >> $GITHUB_ENV
+      - name: Update PATH and Link qt@5
+        run: |
+          echo "PATH=$PATH:/opt/homebrew/bin:/opt/homebrew/sbin" >> $GITHUB_ENV
+          brew link qt@5 --force --overwrite
 
       - name: Install dependencies
         run: |
           source $GITHUB_ENV
           brew update
-          brew install mosquitto zeromq
+          brew install cmake qt@5 protobuf mosquitto zeromq zstd
+        shell: bash
+
+      - name: Set Qt Environment Variables
+        run: |
+          QT_HOME=$(brew --prefix qt@5)
+          echo "QT_HOME=$QT_HOME" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I $QT_HOME/include" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$QT_HOME/lib/pkgconfig" >> $GITHUB_ENV
+          echo "LDFLAGS=$QT_HOME/lib" >> $GITHUB_ENV
         shell: bash
 
       - name: Cache Qt
@@ -53,8 +64,9 @@ jobs:
           aqtversion: '==3.1.18'
           py7zrversion: '==0.22.0'
 
-      - name: Build Plotjuggler
+      - name: Build PlotJuggler
         shell: pwsh
         run: |
-          cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler
-          cmake --build build --target install
+          source $GITHUB_ENV
+          cmake -S src/PlotJuggler -B build/PlotJuggler -DCMAKE_INSTALL_PREFIX=install
+          cmake --build build/PlotJuggler --config RelWithDebInfo --target install
