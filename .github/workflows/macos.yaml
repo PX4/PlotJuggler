@@ -16,14 +16,17 @@ jobs:
       - name: Sync repository
         uses: actions/checkout@v2
 
+      - name: Clean Homebrew locks and cache
+        run: |
+          rm -rf /usr/local/var/homebrew/locks
+          brew cleanup -s
+
       - name: Install dependencies
-        shell: bash
         run: |
           brew update
           brew install mosquitto zeromq qt@5
 
       - name: Set environment variables
-        shell: bash
         run: |
           export CMAKE_PREFIX_PATH=$(brew --prefix qt@5):$(brew --prefix zeromq)
           export LDFLAGS="-L/usr/local/opt/zeromq/lib"
@@ -37,3 +40,5 @@ jobs:
       - name: Setup tmate session
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
+        with:
+          ssh-public-key: ${{ secrets.TMATE_SSH_KEY }}
