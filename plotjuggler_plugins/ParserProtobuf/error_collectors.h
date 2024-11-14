@@ -3,14 +3,14 @@
 
 #include <google/protobuf/io/tokenizer.h>
 #include <google/protobuf/compiler/importer.h>
-
 #include <QStringList>
+#include "absl/strings/string_view.h"
 
 class IoErrorCollector : public google::protobuf::io::ErrorCollector
 {
 public:
   void AddError(int line, google::protobuf::io::ColumnNumber column,
-                const std::string& message) ;
+                const std::string& message);
 
   void AddWarning(int line, google::protobuf::io::ColumnNumber column,
                   const std::string& message);
@@ -27,25 +27,29 @@ private:
 class FileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
 {
 public:
-    void AddError(const std::string& filename, int line, int column,
+  void AddError(const std::string& filename, int line, int column,
+                const std::string& message);
+
+  void AddWarning(const std::string& filename, int line, int column,
                   const std::string& message);
 
-    void AddWarning(const std::string& filename, int line, int column,
-                    const std::string& message);
-    void RecordError(absl::string_view filename, int line, int column,
-                     absl::string_view message) override;
+  void RecordError(absl::string_view filename, int line, int column,
+                   absl::string_view message);
 
-    const QStringList& errors() const {
-        return _errors;
-    }
+  const QStringList& errors() const
+  {
+    return _errors;
+  }
 
-    // Accessor for the collected warnings
-    const QStringList& warnings() const {
-        return _warnings;
-    }
+  // Accessor for the collected warnings
+  const QStringList& warnings() const
+  {
+    return _warnings;
+  }
+
 private:
-    QStringList _errors;
-    QStringList _warnings;
+  QStringList _errors;
+  QStringList _warnings;
 };
 
 #endif  // ERROR_COLLECTORS_H
