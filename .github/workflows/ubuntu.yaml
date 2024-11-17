@@ -28,7 +28,8 @@ jobs:
                 libqt5x11extras5-dev \
                 libprotoc-dev \
                 libzmq3-dev \
-                liblz4-dev libzstd-dev
+                liblz4-dev libzstd-dev \
+                libabsl-dev
 
       - name: Build Plotjuggler
         run: |
