@@ -28,7 +28,7 @@ jobs:
           rm -rf /usr/local/var/homebrew/locks
           brew cleanup -s
           brew update
-          brew install mosquitto zeromq qt@5
+          brew install mosquitto zeromq qt@5 abseil
 
       - name: Build PlotJuggler
         run: |
