@@ -3,7 +3,6 @@ name: ubuntu
 on: [push, pull_request]
 
 jobs:
-
   ubuntu-build:
     runs-on: ${{ matrix.ubuntu-distro }}
     strategy:
@@ -28,8 +27,18 @@ jobs:
                 libqt5x11extras5-dev \
                 libprotoc-dev \
                 libzmq3-dev \
-                liblz4-dev libzstd-dev \
-                libabsl-dev
+                liblz4-dev libzstd-dev 
+              if [[ "${{ matrix.ubuntu-distro }}" == "ubuntu-22.04" ]]; then
+                sudo apt -y install libabsl-dev;
+              elif [[ "${{ matrix.ubuntu-distro }}" == "ubuntu-20.04" ]]; then
+                git clone https://github.com/abseil/abseil-cpp.git;
+                cd abseil-cpp;
+                mkdir build;
+                cd build;
+                cmake ..;
+                make -j$(nproc);
+                sudo make install;
+              fi
 
       - name: Build Plotjuggler
         run: |

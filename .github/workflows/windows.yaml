@@ -19,6 +19,13 @@ jobs:
       - name: Sync repository
         uses: actions/checkout@v2
 
+      - name: Set up vcpkg
+        run: |
+          git clone https://github.com/microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+          ./vcpkg install protobuf mosquitto zeromq
+          echo "VCPKG_ROOT=$(pwd)/vcpkg" >> $GITHUB_ENV
+
       - name: Cache Qt
         id: cache-qt
         uses: actions/cache@v1  # not v2!
@@ -36,11 +43,10 @@ jobs:
 
       - name: Build Plotjuggler
         shell: pwsh
-        run: >
-          cmake -Ax64 -T host=x64 -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler;
+        run: |
+          cmake -Ax64 -T host=x64 -B build -DCMAKE_INSTALL_PREFIX=install -DCMAKE_TOOLCHAIN_FILE=${{ env.VCPKG_ROOT }}/scripts/buildsystems/vcpkg.cmake PlotJuggler;
           cmake --build build --target install
 
       - name: Setup tmate session
         if: ${{ failure() }}
         uses: mxschmitt/action-tmate@v3
-
