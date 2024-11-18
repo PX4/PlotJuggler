@@ -12,28 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: |
-          sudo apt update
-          sudo apt install -y pkg-config libmosquitto-dev libqtav-dev libparquet-dev
-          git clone https://github.com/abseil/abseil-cpp.git
-          cd abseil-cpp
-          mkdir build && cd build
-          cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
-          make -j$(nproc)
-          sudo make install
-
-          cd ~
-          git clone https://github.com/apache/arrow.git
-          cd arrow/cpp
-          mkdir build && cd build
-          cmake -DARROW_PARQUET=ON -DARROW_PYTHON=OFF -DARROW_BUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
-          make -j$(nproc)
-          sudo make install
-          
-      - name: Run industrial_ci
-        uses: ros-industrial/industrial_ci@master
-        env: ${{ matrix.env }}
+      - uses: 'ros-industrial/industrial_ci@master'
+        env: ${{matrix.env}}
         with:
-          config: |
-            - name: plotjuggler
+            package-name: plotjuggler

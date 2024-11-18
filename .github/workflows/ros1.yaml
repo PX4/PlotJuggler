@@ -11,23 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: |
-          wget -qO - https://dist.apache.org/repos/dist/release/arrow/KEYS | gpg --dearmor -o /usr/share/keyrings/apache-arrow-keyring.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/apache-arrow-keyring.gpg] https://apache.jfrog.io/artifactory/arrow/ubuntu/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/apache-arrow.list
-
-          sudo apt update
-          sudo apt install -y libmosquitto-dev libqtav-dev libarrow-dev libparquet-dev pkg-config
-
-          git clone https://github.com/abseil/abseil-cpp.git
-          cd abseil-cpp
-          mkdir build && cd build
-          cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
-          make -j$(nproc)
-          sudo make install
-      - name: Run industrial_ci
-        uses: ros-industrial/industrial_ci@master
-        env: ${{ matrix.env }}
+      - uses: 'ros-industrial/industrial_ci@master'
+        env: ${{matrix.env}}
         with:
-          config: |
-            - name: plotjuggler
+            package-name: plotjuggler
