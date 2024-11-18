@@ -1,4 +1,4 @@
-name: ros1
+name: ros2
 
 on: [push, pull_request]
 
@@ -7,13 +7,12 @@ jobs:
     strategy:
       matrix:
         env:
-          - {ROS_DISTRO: noetic, ROS_REPO: main}
+          - {ROS_DISTRO: humble, ROS_REPO: main}
+          - {ROS_DISTRO: iron, ROS_REPO: main}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: 'ros-industrial/industrial_ci@master'
-        env: ${{ matrix.env }}
+        env: ${{matrix.env}}
         with:
-          config: |
-            PACKAGE_NAME=plotjuggler
-            APT_DEPENDENCIES=libabsl-dev
+            package-name: plotjuggler

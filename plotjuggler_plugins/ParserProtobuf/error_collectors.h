@@ -1,55 +1,39 @@
-#ifndef ERROR_COLLECTORS_H
-#define ERROR_COLLECTORS_H
+#include "error_collectors.h"
+#include <QMessageBox>
+#include <QDebug>
 
-#include <google/protobuf/io/tokenizer.h>
-#include <google/protobuf/compiler/importer.h>
-#include <QStringList>
-#include "absl/strings/string_view.h"
-
-class IoErrorCollector : public google::protobuf::io::ErrorCollector
+void FileErrorCollector::AddError(const std::string& filename, int line, int,
+                                  const std::string& message)
 {
-public:
-  void AddError(int line, google::protobuf::io::ColumnNumber column,
-                const std::string& message);
+  auto msg = QString("File: [%1] Line: [%2] Message: %3\n\n")
+                 .arg(QString::fromStdString(filename))
+                 .arg(line)
+                 .arg(QString::fromStdString(message));
 
-  void AddWarning(int line, google::protobuf::io::ColumnNumber column,
-                  const std::string& message);
+  _errors.push_back(msg);
+}
 
-  const QStringList& errors()
-  {
-    return _errors;
-  }
-
-private:
-  QStringList _errors;
-};
-
-class FileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
+void FileErrorCollector::AddWarning(const std::string& filename, int line, int,
+                                    const std::string& message)
 {
-public:
-  void AddError(const std::string& filename, int line, int column,
-                const std::string& message);
+  auto msg = QString("Warning [%1] line %2: %3")
+                 .arg(QString::fromStdString(filename))
+                 .arg(line)
+                 .arg(QString::fromStdString(message));
+  qDebug() << msg;
+}
 
-  void AddWarning(const std::string& filename, int line, int column,
-                  const std::string& message);
+void IoErrorCollector::AddError(int line, google::protobuf::io::ColumnNumber,
+                                const std::string& message)
+{
+  _errors.push_back(
+      QString("Line: [%1] Message: %2\n").arg(line).arg(QString::fromStdString(message)));
+}
 
-  void RecordError(absl::string_view filename, int line, int column,
-                   absl::string_view message);
-
-  const QStringList& errors() const
-  {
-    return _errors;
-  }
-
-  // Accessor for the collected warnings
-  const QStringList& warnings() const
-  {
-    return _warnings;
-  }
-
-private:
-  QStringList _errors;
-  QStringList _warnings;
-};
-
-#endif  // ERROR_COLLECTORS_H
+void IoErrorCollector::AddWarning(int line, google::protobuf::io::ColumnNumber column,
+                                  const std::string& message)
+{
+  qDebug() << QString("Line: [%1] Message: %2\n")
+                  .arg(line)
+                  .arg(QString::fromStdString(message));
+}

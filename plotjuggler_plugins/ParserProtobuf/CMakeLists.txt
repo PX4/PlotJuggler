@@ -8,29 +8,29 @@ else()
 endif()
 
 find_package(Protobuf QUIET)
-find_package(absl REQUIRED)
 
-if(Protobuf_FOUND)
+if( Protobuf_FOUND)
+
     include_directories( ../ )
-    include_directories(${Protobuf_INCLUDE_DIRS})
-    include_directories(${absl_INCLUDE_DIRS})
-
     add_definitions(${QT_DEFINITIONS})
     add_definitions(-DQT_PLUGIN)
 
     message(STATUS "[Protobuf] found")
-    QT5_WRAP_UI(UI_SRC protobuf_parser.ui)
+    QT5_WRAP_UI ( UI_SRC  protobuf_parser.ui )
+
+    include_directories(${Protobuf_INCLUDE_DIRS})
 
     add_library(ProtobufParser SHARED
         error_collectors.cpp
         protobuf_parser.cpp
         protobuf_factory.cpp
         protobuf_parser.h
-        ${UI_SRC})
+        ${UI_SRC}  )
 
-    if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    if (${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         find_library(ABSL_SPINLOCK_WAIT_LIB absl_spinlock_wait)
-        target_link_libraries(ProtobufParser ${ABSL_SPINLOCK_WAIT_LIB})
+
+        target_link_libraries(ProtobufParser ${ABSL_SPINLOCK_WAIT_LIB} )
     endif()
 
     target_link_libraries(ProtobufParser
@@ -38,10 +38,9 @@ if(Protobuf_FOUND)
         ${Qt5Xml_LIBRARIES}
         ${Protobuf_LIBS}
         plotjuggler_base
-        plotjuggler_qwt
-        absl::strings)
+        plotjuggler_qwt)
 
-    install(TARGETS ProtobufParser DESTINATION ${PJ_PLUGIN_INSTALL_DIRECTORY})
+    install(TARGETS ProtobufParser DESTINATION ${PJ_PLUGIN_INSTALL_DIRECTORY}  )
 else()
-    message("[Protobuf] not found: skipping compilation of plugin ProtobufParser")
+    message("[Protobuf] not found: skipping compilatiopn of plugin ProtobufParser")
 endif()
