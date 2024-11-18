@@ -1,39 +1,45 @@
-#include "error_collectors.h"
-#include <QMessageBox>
-#include <QDebug>
+#ifndef ERROR_COLLECTORS_H
+#define ERROR_COLLECTORS_H
 
-void FileErrorCollector::AddError(const std::string& filename, int line, int,
-                                  const std::string& message)
+#include <google/protobuf/io/tokenizer.h>
+#include <google/protobuf/compiler/importer.h>
+
+#include <QStringList>
+
+class IoErrorCollector : public google::protobuf::io::ErrorCollector
 {
-  auto msg = QString("File: [%1] Line: [%2] Message: %3\n\n")
-                 .arg(QString::fromStdString(filename))
-                 .arg(line)
-                 .arg(QString::fromStdString(message));
+public:
+  void AddError(int line, google::protobuf::io::ColumnNumber column,
+                const std::string& message);
 
-  _errors.push_back(msg);
-}
+  void AddWarning(int line, google::protobuf::io::ColumnNumber column,
+                  const std::string& message);
 
-void FileErrorCollector::AddWarning(const std::string& filename, int line, int,
-                                    const std::string& message)
+  const QStringList& errors()
+  {
+    return _errors;
+  }
+
+private:
+  QStringList _errors;
+};
+
+class FileErrorCollector : public google::protobuf::compiler::MultiFileErrorCollector
 {
-  auto msg = QString("Warning [%1] line %2: %3")
-                 .arg(QString::fromStdString(filename))
-                 .arg(line)
-                 .arg(QString::fromStdString(message));
-  qDebug() << msg;
-}
+public:
+  void AddError(const std::string& filename, int line, int,
+                const std::string& message);
 
-void IoErrorCollector::AddError(int line, google::protobuf::io::ColumnNumber,
-                                const std::string& message)
-{
-  _errors.push_back(
-      QString("Line: [%1] Message: %2\n").arg(line).arg(QString::fromStdString(message)));
-}
+  void AddWarning(const std::string& filename, int line, int,
+                  const std::string& message);
 
-void IoErrorCollector::AddWarning(int line, google::protobuf::io::ColumnNumber column,
-                                  const std::string& message)
-{
-  qDebug() << QString("Line: [%1] Message: %2\n")
-                  .arg(line)
-                  .arg(QString::fromStdString(message));
-}
+  const QStringList& errors()
+  {
+    return _errors;
+  }
+
+private:
+  QStringList _errors;
+};
+
+#endif  // ERROR_COLLECTORS_H
