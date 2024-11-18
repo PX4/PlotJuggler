@@ -12,7 +12,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: 'ros-industrial/industrial_ci@master'
-        env: ${{matrix.env}}
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y pkg-config libmosquitto-dev libqtav-dev libparquet-dev
+          git clone https://github.com/abseil/abseil-cpp.git
+          cd abseil-cpp
+          mkdir build && cd build
+          cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
+          make -j$(nproc)
+          sudo make install
+      - name: Run industrial_ci
+        uses: ros-industrial/industrial_ci@master
+        env: ${{ matrix.env }}
         with:
-            package-name: plotjuggler
+          config: |
+            - name: plotjuggler
