@@ -23,7 +23,7 @@ jobs:
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           ./vcpkg/bootstrap-vcpkg.sh
-          ./vcpkg install
+          ./vcpkg/vcpkg.exe install
           echo "VCPKG_ROOT=$(pwd)/vcpkg" >> $GITHUB_ENV
 
       - name: Cache Qt

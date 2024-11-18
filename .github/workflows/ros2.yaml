@@ -22,6 +22,15 @@ jobs:
           cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
           make -j$(nproc)
           sudo make install
+
+          cd ~
+          git clone https://github.com/apache/arrow.git
+          cd arrow/cpp
+          mkdir build && cd build
+          cmake -DARROW_PARQUET=ON -DARROW_PYTHON=OFF -DARROW_BUILD_SHARED=ON -DCMAKE_INSTALL_PREFIX=/usr/local ..
+          make -j$(nproc)
+          sudo make install
+          
       - name: Run industrial_ci
         uses: ros-industrial/industrial_ci@master
         env: ${{ matrix.env }}
