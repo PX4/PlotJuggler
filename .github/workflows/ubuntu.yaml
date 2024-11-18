@@ -27,13 +27,9 @@ jobs:
                 libqt5x11extras5-dev \
                 libprotoc-dev \
                 libzmq3-dev \
-                liblz4-dev libzstd-dev 
+                liblz4-dev libzstd-dev
 
       - name: Build Plotjuggler
         run: |
             cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler;
             cmake --build build --target install
-
-      - name: Setup tmate session
-        if: ${{ failure() }}
-        uses: mxschmitt/action-tmate@v3
