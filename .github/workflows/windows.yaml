@@ -20,6 +20,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Set up vcpkg
+        shell: bash
         run: |
           git clone https://github.com/microsoft/vcpkg.git
           ./vcpkg/bootstrap-vcpkg.sh
