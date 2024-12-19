@@ -1,9 +1,14 @@
 name: macos
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+    - 'main'
+  pull_request:
+    branches:
+    - '*'
 
 jobs:
-
   macos-build:
     runs-on: ${{ matrix.os }}
     strategy:
@@ -31,3 +36,5 @@ jobs:
           export LIBRARY_PATH=/usr/local/opt/zeromq/lib
           export CPATH=/usr/local/opt/zeromq/include
           cmake -B build -DCMAKE_INSTALL_PREFIX=install PlotJuggler
+          cmake --build build --target install
+
