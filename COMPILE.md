@@ -87,7 +87,7 @@ docker buildx build -o . .
 On Mac, the dependencies can be installed using [brew](https://brew.sh/) with the following command:
 
 ```shell
-brew install cmake qt@5 protobuf mosquitto zeromq zstd
+brew install cmake qt@5 protobuf@21 mosquitto zeromq zstd
 ```
 
 If you have multiple versions of Qt installed (e.g., `qt` and `qt@5`), you may need to explicitly link `qt@5` to ensure it is found by CMake. Use the following commands:
@@ -120,7 +120,7 @@ export LDFLAGS="$QT_HOME/lib"
 Clone the repository into **~/plotjuggler_ws**:
 
 ```shell
-git clone https://github.com/PX4/PlotJuggler.git ~/plotjuggler_ws/src/PlotJuggler
+git clone https://github.com/facontidavide/PlotJuggler.git ~/plotjuggler_ws/src/PlotJuggler
 cd ~/plotjuggler_ws
 ```
 
