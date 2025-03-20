@@ -19,8 +19,6 @@ if(ZeroMQ_FOUND)
 
     add_library(DataStreamZMQ SHARED datastream_zmq.cpp ${UI_SRC})
 
-    target_include_directories(DataStreamZMQ PRIVATE ${ZeroMQ_INCLUDE_DIRS})
-
     target_link_libraries(DataStreamZMQ
         ${Qt5Widgets_LIBRARIES}
         plotjuggler_base
